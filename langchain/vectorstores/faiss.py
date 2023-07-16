@@ -351,8 +351,11 @@ class FAISS(VectorStore):
             List of Documents and similarity scores selected by maximal marginal
                 relevance and score for each.
         """
-        scores, indices = self.index.search(
-            np.array([embedding], dtype=np.float32),
+        embedding_array = np.array([embedding], dtype=np.float32)
+    distances = np.empty((embedding_array.shape[0], k), dtype=np.float32)
+    labels = np.empty((embedding_array.shape[0], k), dtype=np.int64)
+    self.index.search(embedding_array, k, distances, labels)
+    scores, indices = distances, labels,
             fetch_k if filter is None else fetch_k * 2,
         )
         if filter is not None:
